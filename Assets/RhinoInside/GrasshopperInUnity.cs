@@ -31,10 +31,6 @@ public class GrasshopperInUnity : MonoBehaviour
         }
 
         Rhino.Runtime.HostUtils.RegisterNamedCallback("FromGHMesh", FromGHMesh);
-
-        Rhino.Runtime.HostUtils.RegisterNamedCallback("FromGHCreateSlider", FromGHCreateSlider);
-
-        Rhino.Runtime.HostUtils.RegisterNamedCallback("FromGHClearUI", FromGHClearUI);
         Rhino.Runtime.HostUtils.RegisterNamedCallback("FromGHClearMesh", FromGHClearMesh);
     }
 
@@ -59,16 +55,6 @@ public class GrasshopperInUnity : MonoBehaviour
             Rhino.Runtime.HostUtils.ExecuteNamedCallback("ToGrasshopper", args);
         }
     }
-
-    public void SendSliderValue(float val, string id)
-    {
-        using (var args = new Rhino.Runtime.NamedParametersEventArgs())
-        {
-            args.Set("sliderValue", val);
-            Rhino.Runtime.HostUtils.ExecuteNamedCallback("ToGH_Slider_" + id, args);
-        }
-    }
-
     #endregion
 
     #region from GH functions
@@ -123,60 +109,6 @@ public class GrasshopperInUnity : MonoBehaviour
             }
         }
     }
-    void FromGHCreateSlider(object sender, Rhino.Runtime.NamedParametersEventArgs args)
-    {
-        if (Application.isPlaying)
-        {
-            string id = "";
-            string sliderName = "";
-            double minVal = 0f;
-            double maxVal = 0f;
-            double val = 0f;
-            int type = 0;
-            if (args.TryGetString("id", out id))
-            {
-                args.TryGetString("name", out sliderName);
-                args.TryGetDouble("min", out minVal);
-                args.TryGetDouble("max", out maxVal);
-                args.TryGetDouble("value", out val);
-                args.TryGetInt("type", out type);
-
-                var sliderPanelObj = (GameObject)Instantiate(sliderPanelPrefab, uiParent.transform);
-                sliderPanelObj.name = id;
-                SliderPanel sliderPanel = sliderPanelObj.GetComponent<SliderPanel>();
-                sliderPanel.text.text = sliderName;
-                sliderPanel.slider.minValue = (float)minVal;
-                sliderPanel.slider.maxValue = (float)maxVal;
-                sliderPanel.slider.value = (float)val;
-                if (type > 0) {
-                    sliderPanel.slider.wholeNumbers = true;
-                }
-                else
-                {
-                    sliderPanel.slider.wholeNumbers = false;
-                }
-                sliderPanel.slider.onValueChanged.AddListener(value =>
-                {
-                    SendSliderValue(value, id);
-                });
-
-            }
-        }
-    }
-
-    void FromGHClearUI(object sender, Rhino.Runtime.NamedParametersEventArgs args)
-    {
-        string id = "";
-        if (args.TryGetString("id", out id))
-        {
-            var gb = GameObject.Find(id);
-            if (gb != null)
-            {
-                Destroy(gb);
-            }
-        }
-    }
-
     void FromGHClearMesh(object sender, Rhino.Runtime.NamedParametersEventArgs args)
     {
         string id = "";
@@ -187,7 +119,6 @@ public class GrasshopperInUnity : MonoBehaviour
     }
 
     #endregion
-
 
     #region rhino / gh window
 
