@@ -13,6 +13,7 @@ public class GrasshopperInUnity : MonoBehaviour
     public GameObject uiParent;
     public GameObject sliderPanelPrefab;
     public GameObject geoPrefab;
+    public GameObject physicalSliderPrefab;
 
     #region mono behaviour
 
@@ -30,7 +31,7 @@ public class GrasshopperInUnity : MonoBehaviour
         }
 
         Rhino.Runtime.HostUtils.RegisterNamedCallback("FromGHMesh", FromGHMesh);
-        
+
         Rhino.Runtime.HostUtils.RegisterNamedCallback("FromGHCreateSlider", FromGHCreateSlider);
 
         Rhino.Runtime.HostUtils.RegisterNamedCallback("FromGHClearUI", FromGHClearUI);
@@ -40,7 +41,14 @@ public class GrasshopperInUnity : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        GameObject ps = GameObject.Find("Slider_Button");
+        var pt = ps.transform.position.ToRhino();
 
+        using (var args = new Rhino.Runtime.NamedParametersEventArgs())
+        {
+            args.Set("point", new Rhino.Geometry.Point(pt));
+            Rhino.Runtime.HostUtils.ExecuteNamedCallback("ToGrasshopper", args);
+        }
     }
 
     #endregion
@@ -55,7 +63,6 @@ public class GrasshopperInUnity : MonoBehaviour
             Rhino.Runtime.HostUtils.ExecuteNamedCallback("ToGH_Slider_" + id, args);
         }
     }
-
 
     #endregion
 
@@ -78,7 +85,6 @@ public class GrasshopperInUnity : MonoBehaviour
             Destroy(parentGB);
         }
     }
-
     void FromGHMesh(object sender, Rhino.Runtime.NamedParametersEventArgs args)
     {
         if (Application.isPlaying)
@@ -112,8 +118,6 @@ public class GrasshopperInUnity : MonoBehaviour
             }
         }
     }
-
-
     void FromGHCreateSlider(object sender, Rhino.Runtime.NamedParametersEventArgs args)
     {
         if (Application.isPlaying)
@@ -154,7 +158,6 @@ public class GrasshopperInUnity : MonoBehaviour
             }
         }
     }
-
 
     void FromGHClearUI(object sender, Rhino.Runtime.NamedParametersEventArgs args)
     {
