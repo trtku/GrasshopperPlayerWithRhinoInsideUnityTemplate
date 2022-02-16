@@ -41,19 +41,24 @@ public class GrasshopperInUnity : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        GameObject ps = GameObject.Find("Slider_Button");
-        var pt = ps.transform.position.ToRhino();
-
-        using (var args = new Rhino.Runtime.NamedParametersEventArgs())
-        {
-            args.Set("point", new Rhino.Geometry.Point(pt));
-            Rhino.Runtime.HostUtils.ExecuteNamedCallback("ToGrasshopper", args);
-        }
+        SendCoord("Slider_Button", "point");
     }
 
     #endregion
 
     #region to GH functions
+
+    public void SendCoord(string name, string key)
+    {
+        GameObject ps = GameObject.Find(name);
+        var pt = ps.transform.position.ToRhino();
+
+        using (var args = new Rhino.Runtime.NamedParametersEventArgs())
+        {
+            args.Set(key, new Rhino.Geometry.Point(pt));
+            Rhino.Runtime.HostUtils.ExecuteNamedCallback("ToGrasshopper", args);
+        }
+    }
 
     public void SendSliderValue(float val, string id)
     {
@@ -171,7 +176,6 @@ public class GrasshopperInUnity : MonoBehaviour
             }
         }
     }
-    
 
     void FromGHClearMesh(object sender, Rhino.Runtime.NamedParametersEventArgs args)
     {
